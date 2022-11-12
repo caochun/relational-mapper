@@ -10,9 +10,32 @@ import * as MockData from './mock_data/data.jsx';
 
 import 'antd/dist/antd.css';
 import './index.less';
+var { graphql, buildSchema } = require('graphql');
 
 const {Header} = Layout;
 const {columns, data} = MockData;
+var schema = buildSchema(`
+  type Query {
+    hello: String
+  }
+`);
+
+// The rootValue provides a resolver function for each API endpoint
+var rootValue = {
+  hello: () => {
+    return 'Hello world!';
+  },
+};
+
+// Run the GraphQL query '{ hello }' and print out the response
+graphql({
+  schema,
+  source: '{ hello }',
+  rootValue
+}).then((response) => {
+  console.log(response);
+});
+
 
 const config = {
   // butterfly-dag 属性
