@@ -11,9 +11,9 @@ object Main {
 
   def main(args: Array[String]): Unit = {
 
-    val toParse: String = Try ( args(0) ).getOrElse("pi(test, coucou)(sigma(t = k)(Person leftJoin(p = c) Car leftJoin(c = z) Zob))")
+    val toParse: String = Try ( args(0) ).getOrElse("pi(test, name)(sigma(o = p)(Person join(p = h and w = m) House leftJoin(h = c) Company))")
 
-    val Parsed.Success(value, successIndex) = parse(toParse, Parser.parseAlgebra(_))sbt
+    val Parsed.Success(value, successIndex) = parse(toParse, Parser.parseAlgebra(_))
 
     println("-" * 50)
 

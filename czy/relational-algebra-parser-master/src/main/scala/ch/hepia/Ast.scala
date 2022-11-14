@@ -24,14 +24,26 @@ object Ast {
     case class Cond(left: AttributeId, op: Operator, right: Value) extends BooleanOperator
   }
 
+  sealed trait JoinType
+  object JoinType {
+    case object InnerJoin extends JoinType
+    case object LeftJoin extends JoinType
+    case object RightJoin extends JoinType
+  }
+
   case class JoinCond(left: AttributeId, op: Operator, right: AttributeId)
+  // sealed trait JoinCond
+  // object JoinCond {
+  //   case class And(left: JoinCond, right:JoinCond) extends JoinCond
+  //   case class Or(left: JoinCond, right:JoinCond) extends JoinCond
+  //   case class Cond(left: AttributeId,op:Operator, right:AttributeId) extends JoinCond
+  // }
 
   sealed trait Relation extends Ast
   object Relation {
     case class SingleRelation(name: RelationalId) extends Relation
     case class Sigma(cond: BooleanOperator, relation: Relation) extends Relation
-    case class RelationExpr(singleRelation: SingleRelation, joined: (JoinCond, Relation)*) extends Relation
-    case class LeftJoinExpr(singleRelation: SingleRelation, joined: (JoinCond, Relation)*) extends Relation
+    case class RelationExpr(singleRelation: SingleRelation, joined: (BooleanOperator,JoinType, Relation)*) extends Relation
   }
 
   case class PiExpr(attributes: Seq[AttributeId], relation: Relation) extends Ast

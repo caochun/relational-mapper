@@ -22,35 +22,46 @@ object Parser {
   def funcArguments[_: P] =
     P( " ".rep ~ attributeName.!.rep(sep=" ".rep ~ "," ~ " ".rep./) ).map(seqs => seqs.map( AttributeId ) )
 
+  // def eqJoinCond[_: P] = P(
+  //   for {
+  //     _ <- P(" join(")
+  //     a1 <- attributeName
+  //     _ <- P(" = ")
+  //     a2 <- attributeName
+  //     _ <- P(") ")
+  //   } yield (JoinCond(a1, Operator.Eq, a2),JoinType.InnerJoin)
+  // )
+
   def eqJoinCond[_: P] = P(
     for {
       _ <- P(" join(")
-      a1 <- attributeName
-      _ <- P(" = ")
-      a2 <- attributeName
+      le <- logicExpr
       _ <- P(") ")
-    } yield JoinCond(a1, Operator.Eq, a2)
+    } yield (le,JoinType.InnerJoin)
   )
+  
+  // def eqLeftJoinCond[_: P] = P(
+  //   for {
+  //     _ <- P(" leftJoin(")
+  //     a1 <- attributeName
+  //     _ <- P(" = ")
+  //     a2 <- attributeName
+  //     _ <- P(") ")
+  //   } yield (JoinCond(a1, Operator.Eq, a2),JoinType.LeftJoin)
+  // )
 
   def eqLeftJoinCond[_: P] = P(
     for {
       _ <- P(" leftJoin(")
-      a1 <- attributeName
-      _ <- P(" = ")
-      a2 <- attributeName
+      le <- logicExpr
       _ <- P(") ")
-    } yield JoinCond(a1, Operator.Eq, a2)
+    } yield (le,JoinType.LeftJoin)
   )
 
   def originExpr[_: P]: P[Relation.RelationExpr] =
-    P(singleRelation ~ (eqJoinCond ~ singleRelation).rep).map {
+    P(singleRelation ~ ((eqJoinCond|eqLeftJoinCond) ~ singleRelation).rep).map {
       case (sr, joined) => Relation.RelationExpr(sr, joined:_*)
-    }
-
-  def leftJoinExpr[_: P]: P[Relation.LeftJoinExpr] =
-    P(singleRelation ~ (eqLeftJoinCond ~ singleRelation).rep).map {
-      case (sr, joined) => Relation.LeftJoinExpr(sr, joined:_*)
-    }
+    } 
 
   def neqSign[_: P]: P[Operator] = P("!=").!.map(_ => Operator.Eq )
   def eqSign[_: P]: P[Operator] = P("=").!.map(_ => Operator.Eq )
@@ -68,9 +79,9 @@ object Parser {
   def andTerm[_: P]: P[BooleanOperator] = P( logicTerm ~ " and " ~ logicExpr ).map {case (t, lf) => Ast.BooleanOperator.And(t,lf)}
   def logicExpr[_: P]: P[BooleanOperator] = P( andTerm | logicTerm )
 
-  def sigmaExpr[_: P]: P[Relation] = P( "sigma(" ~ logicExpr ~ ")(" ~ (leftJoinExpr|originExpr) ~  ")" ).map { case (logicOp, rel) => Relation.Sigma(logicOp, rel) }
+  def sigmaExpr[_: P]: P[Relation] = P( "sigma(" ~ logicExpr ~ ")(" ~ originExpr ~ ")" ).map { case (logicOp, rel) => Relation.Sigma(logicOp, rel) }
 
-  def relationExpr[_: P]: P[Relation] = P( sigmaExpr|originExpr|leftJoinExpr )
+  def relationExpr[_: P]: P[Relation] = P( sigmaExpr|originExpr )
 
   def piExpr[_: P] = P("pi(" ~ funcArguments ~ ")(" ~ relationExpr ~ ")").map { case (attrs, rel) => PiExpr(attrs, rel) }
 
