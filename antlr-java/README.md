@@ -13,7 +13,7 @@
 
 + 使用visitor而不是接着仿照baeldung使用listener，相较于visitor，listener会自己遍历完语法树，并且在进入离开某个node时调用enternode和exitnode。而visitor只会手动去visit，这个更像我们编译原理，使用bison/flex去手工打磨。
 
-+ 语句->词素流->语法树
++ 语句->token流->语法树
 
   不同于flex+bison的分布处理，antlr4将这俩一起写在.g4里面。区分方法如下
 
