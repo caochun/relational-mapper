@@ -6,6 +6,7 @@ object Ast {
   case class RelationalId(name: String)
   case class AttributeId(name: String)
   case class Value(value: String)
+  //case class AnyPara(content : String)
 
   sealed trait Operator
   object Operator {
@@ -22,6 +23,7 @@ object Ast {
     case class And(left: BooleanOperator, right: BooleanOperator) extends BooleanOperator
     case class Or(left: BooleanOperator, right: BooleanOperator) extends BooleanOperator
     case class Cond(left: AttributeId, op: Operator, right: Value) extends BooleanOperator
+    case class JoinCond(left: AttributeId, op: Operator, right: AttributeId) extends BooleanOperator
   }
 
   sealed trait JoinType
@@ -31,7 +33,7 @@ object Ast {
     case object RightJoin extends JoinType
   }
 
-  case class JoinCond(left: AttributeId, op: Operator, right: AttributeId)
+  
   // sealed trait JoinCond
   // object JoinCond {
   //   case class And(left: JoinCond, right:JoinCond) extends JoinCond

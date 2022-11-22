@@ -28,14 +28,10 @@ object AstShowSql {
     case And(left, right) => toSql(left) + " AND " + toSql(right)
     case Or(left, right) => toSql(left) + " OR " + toSql(right)
     case Cond(left, op, right)  => left.name + ShowSql[Operator].showSql(op) + right.value
+    case JoinCond(left, op, right)  => left.name + ShowSql[Operator].showSql(op) + right.name
   }
   implicit val booleanCanShowSql = ShowSql[BooleanOperator]( toSql )
 
-  object JoinCond {
-    def toSql(joinCond: JoinCond): String = {
-      joinCond.left.name + ShowSql[Operator].showSql(joinCond.op) + joinCond.right.name
-    }
-  }
 
   def toSql(relation: Relation): String = relation match {
     case SingleRelation(id) => id.name
