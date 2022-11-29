@@ -16,6 +16,7 @@ object AstShowSql {
     case Less => " < "
     case BigEq => " >= "
     case LessEq => " <= "
+    case In => "IN"
   }
 
   implicit val joinTypeCanShowSql = ShowSql[JoinType]{
@@ -29,21 +30,24 @@ object AstShowSql {
     case Or(left, right) => toSql(left) + " OR " + toSql(right)
     case Cond(left, op, right)  => left.name + ShowSql[Operator].showSql(op) + right.value
     case JoinCond(left, op, right)  => left.name + ShowSql[Operator].showSql(op) + right.name
+    case OtherCond(content) => content
   }
   implicit val booleanCanShowSql = ShowSql[BooleanOperator]( toSql )
 
 
   def toSql(relation: Relation): String = relation match {
-    case SingleRelation(id) => id.name
-    case RelationExpr(sr, joined @ _* ) => toSql(sr) + joined.map { case (bo,jt, rel) => "\n" +ShowSql[JoinType].showSql(jt) + toSql(rel) + " ON " + ShowSql[BooleanOperator].showSql(bo) }.mkString
+    case SingleRelation(id,anotherName)  if anotherName.name=="" => id.name
+    case SingleRelation(id,anotherName)  if anotherName.name!="" => id.name+" "+anotherName.name
+    case RelationExpr(sr, joined @ _* ) => toSql(sr) + joined.map { case (bo,jt, rel) => "\n" +ShowSql[JoinType].showSql(jt) + toSql(rel) + "\nON " + ShowSql[BooleanOperator].showSql(bo) }.mkString
     case Sigma(cond, rel) =>  toSql(rel) + "\nWHERE " + ShowSql[BooleanOperator].showSql(cond)
+    case PiRelationExpr(attrs, rel) => "SELECT " + attrs.map(a => a.name).mkString(", ") + "\nFROM " + toSql(rel)
   }
   implicit val relationCanShowSql = ShowSql[Relation]( r => toSql(r) )
 
   implicit val AstcanShowSql = ShowSql[Ast]{
-    case PiExpr(attrs, rel) => "SELECT " + attrs.map(a => a.name).mkString(", ") + "\nFROM " + ShowSql[Relation].showSql(rel)
+    case PiRelationExpr(attrs, rel) => "SELECT " + attrs.map(a => a.name).mkString(", ") + "\nFROM " + ShowSql[Relation].showSql(rel)
     case Sigma(cond, rel) => "SELECT *\nFROM " + ShowSql[Relation].showSql(rel) + "\nWHERE " + ShowSql[BooleanOperator].showSql(cond)
-    case RelationExpr(sr, joined @ _* ) => "SELECT *\nFROM " + toSql(sr) + joined.map { case (bo,jt, rel) => "\n" +ShowSql[JoinType].showSql(jt) + toSql(rel) + " ON " + ShowSql[BooleanOperator].showSql(bo) }.mkString
+    case RelationExpr(sr, joined @ _* ) => "SELECT *\nFROM " + toSql(sr) + joined.map { case (bo,jt, rel) => "\n" +ShowSql[JoinType].showSql(jt) + toSql(rel) + "\nON " + ShowSql[BooleanOperator].showSql(bo) }.mkString
     case _:SingleRelation => throw new Exception("Shouldn't be possible")
   }
 
