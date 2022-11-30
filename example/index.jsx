@@ -1,46 +1,23 @@
 import React from 'react';
 import _ from 'lodash';
 import ReactDOM from 'react-dom';
-import {Layout, Tooltip} from 'antd';
-import {BrowserRouter as Router} from 'react-router-dom';
+import { Layout, Tooltip } from 'antd';
+import { BrowserRouter as Router } from 'react-router-dom';
 
 import TableBuilding from '../src/index.tsx';
-import {nodeMenu, edgeMenu, actionMenu} from './menu';
+import { nodeMenu, edgeMenu, actionMenu } from './menu';
 import * as MockData from './mock_data/data.jsx';
 
 import 'antd/dist/antd.css';
 import './index.less';
-var { graphql, buildSchema } = require('graphql');
 
-const {Header} = Layout;
-const {columns, data} = MockData;
-var schema = buildSchema(`
-  type Query {
-    hello: String
-  }
-`);
-
-// The rootValue provides a resolver function for each API endpoint
-var rootValue = {
-  hello: () => {
-    return 'Hello world!';
-  },
-};
-
-// Run the GraphQL query '{ hello }' and print out the response
-graphql({
-  schema,
-  source: '{ hello }',
-  rootValue
-}).then((response) => {
-  console.log(response);
-});
-
+const { Header } = Layout;
+const { columns, data } = MockData;
 
 const config = {
   // butterfly-dag 属性
-  butterfly:{
-    theme:{
+  butterfly: {
+    theme: {
       edge: {
         // shapeType: 'Manhattan',
       }
@@ -83,14 +60,14 @@ const config = {
   titleExtIconRender: () => {
     return (
       <Tooltip title="自定义title ext icon">
-        <i 
+        <i
           className="table-build-icon table-build-icon-iconfontxiaogantanhao"
         />
       </Tooltip>
     );
   },
   labelRender: (label) => {
-    if(!label) {
+    if (!label) {
       return 'connection';
     }
 
@@ -121,29 +98,161 @@ class Component extends React.Component {
     });
   }
 
+  onEditEdge = () => {
+    const data = this.state.data;
+    console.log(data.edges.length);
+    data.edges.push({
+      "id": data.edges.length,
+      "sourceNode": "aaa",
+      "targetNode": "bbb",
+      "source": "x",
+      "target": "left_join"
+    });
+
+    this.setState({
+      data: { ...data }
+    });
+  }
+
   onAddEdge = () => {
     const data = this.state.data;
 
     data.edges.push({
-      "id": 1,
+      "id": data.edges.length,
       "sourceNode": "aaa",
       "targetNode": "bbb",
-      "source": "field_1",
-      "target": "field_2"
+      "source": "x",
+      "target": "left_join"
     });
 
     this.setState({
-      data: {...data}
+      data: { ...data }
     });
   }
 
   onDelEdge = () => {
     const data = this.state.data;
     data.edges.pop();
+    console.log("onDelEdge");
+    this.setState({
+      data: { ...data }
+    });
+  }
+
+  onDelxEdge = (key) => {
+    console.log("key:", key)
+    console.log("onDelxEdge");
+    const data = { ...this.state.data };
+    var temp = [];
+    var t;
+    t = data.edges.pop();
+    while (t && (t.source != key.source || t.target != key.target || t.sourceNode != key.sourceNode || t.targetNode != key.targetNode)) {
+      temp.push(t);
+      t = data.edges.pop();
+    }
+    t = temp.pop();
+    while (t) {
+      data.edges.push(t);
+      t = temp.pop();
+    }
 
     this.setState({
-      data: {...data}
+      data: { ...data }
     });
+  }
+
+  onDelxNode = (key) => {
+    console.log("key:", key)
+    console.log("onDelxNode");
+    const data = { ...this.state.data };
+    var temp = [];
+    var t;
+    t = data.nodes.pop();
+    while (t && (t.id != key.id)) {
+      temp.push(t);
+      t = data.nodes.pop();
+    }
+    t = temp.pop();
+    while (t) {
+      data.nodes.push(t);
+      t = temp.pop();
+    }
+
+    this.setState({
+      data: { ...data }
+    });
+  }
+
+  onAddNode = () => {
+    const data = this.state.data;
+
+    data.nodes.push({
+      "top": 50,
+      "left": 1000,
+      "id": data.nodes.length,
+      "title": "test",
+      "fields": [
+        {
+          "id": "x",
+          "type": "string",
+          "desc": "笛卡尔乘积"
+        },
+        {
+          "id": "left_join",
+          "type": "string",
+          "desc": "左连接"
+        },
+        {
+          "id": "right_join",
+          "type": "string",
+          "desc": "右链接"
+        }
+      ]
+    });
+
+    this.setState({
+      data: { ...data }
+    });
+  }
+
+  onDelNode = () => {
+    const data = this.state.data;
+    data.nodes.pop();
+
+    console.log("onDelNode");
+    this.setState({
+      data: { ...data }
+    });
+  }
+  onCreateRes = () => {
+    const data = { ...this.state.data };
+    console.log('dataini:', data);
+    var res = "";
+    console.log('resini:', res);
+    res = res + data.edges[0].sourceNode;
+
+    data.edges.forEach(function (temp) {
+      console.log('temps:', temp.sourceNode);
+      console.log('tempt:', temp.targetNode);
+      res = res + " " + temp.source + " " + temp.targetNode;
+      console.log('resplus:', res);
+      console.log('tempafter:', temp);
+    });
+
+    // var temp = data.edges.pop()
+    // console.log('tempini:', temp);
+    // while (temp) {
+    //   console.log('temps:', temp.sourceNode);
+    //   console.log('tempt:', temp.targetNode);
+    //   res = res + temp.sourceNode + " x " + temp.targetNode + " ";
+    //   console.log('resplus:', res);
+    //   temp = data.edges.pop();
+    //   console.log('tempafter:', temp);
+    // }
+    console.log('resfinal:', res);
+    console.log('dataaft:', data);
+    console.log('this.state.data:', this.state.data);
+    return res;
   }
 
   onSetGridMode = () => {
@@ -153,14 +262,14 @@ class Component extends React.Component {
   }
 
   render() {
-    const {selectable} = this.state;
+    const { selectable } = this.state;
 
     return (
       <TableBuilding
         // =========== 画布事件 ===========
         beforeLoad={(utils) => {
           // 自定义注册箭头
-          const {Arrow} = utils;
+          const { Arrow } = utils;
           Arrow.registerArrow([{
             key: 'arrow1',
             type: 'svg',
@@ -180,7 +289,7 @@ class Component extends React.Component {
         // =========== 节点Table相关属性 ===========
         columns={this.state.columns}
         data={this.state.data}
-        onDblClickNode={(node) => {}}
+        onDblClickNode={(node) => { }}
         emptyContent={
           <div className="empty-content">
             <p className="desc">暂无数据</p>
@@ -197,12 +306,21 @@ class Component extends React.Component {
         }
 
         // =========== 菜单相关属性 ===========
-        nodeMenu={nodeMenu}
-        edgeMenu={edgeMenu}
+        nodeMenu={nodeMenu({
+          onDelxNode: this.onDelxNode
+        })}
+        edgeMenu={edgeMenu({
+          onEditEdge: this.onEditEdge,
+          onDelEdge: this.onDelEdge,
+          onDelxEdge: this.onDelxEdge
+        })}
         actionMenu={actionMenu({
           onAddEdge: this.onAddEdge,
           onDelEdge: this.onDelEdge,
-          onSetGridMode: this.onSetGridMode
+          onAddNode: this.onAddNode,
+          onDelNode: this.onDelNode,
+          onSetGridMode: this.onSetGridMode,
+          onCreateRes: this.onCreateRes
         })}
 
         // =========== 画布配置 ===========
@@ -239,7 +357,7 @@ ReactDOM.render((
     <Layout>
       <Header className='header'>DTDesign-React可视化建模组件</Header>
       <Layout>
-        <Component/>
+        <Component />
       </Layout>
     </Layout>
   </Router>

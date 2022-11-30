@@ -4,12 +4,13 @@ import * as ReactDOM from 'react-dom';
 import $ from 'jquery';
 import * as _ from 'lodash';
 
-import {bfCfg} from './config';
-import {Arrow} from 'butterfly-dag';
+import * as MockData from '../example/mock_data/data.jsx';
+import { bfCfg } from './config';
+import { Arrow } from 'butterfly-dag';
 import Canvas from './canvas/canvas';
 import EdgeRender from './component/edge-render'
-import ActionMenu, {action} from './component/action-menu';
-import {transformInitData, diffPropsData} from './adaptor';
+import ActionMenu, { action } from './component/action-menu';
+import { transformInitData, diffPropsData } from './adaptor';
 
 import 'butterfly-dag/dist/index.css';
 
@@ -99,7 +100,8 @@ interface ComProps {
   // TODO: 展开/收缩节点
   // onDeleteNodes(nodeInfo: any): void,
   // onDeleteEdges(edgeInfo: any): void,
-  // onConnectEdges(edgeInfo: any): void,
+  onConnectEdges(edgeInfo: any): void,
+  onConnectNewEdges(edgeInfo: any): void,
   // onReConnectEdges(addEdgeInfo: any, rmEdgeInfo: any): void,
 };
 
@@ -130,7 +132,7 @@ export default class TableBuilding extends React.Component<ComProps, any> {
   }
 
   componentDidMount() {
-    const {beforeLoad = noop, config = {}} = this.props;
+    const { beforeLoad = noop, config = {} } = this.props;
 
     let root = ReactDOM.findDOMNode(this) as HTMLElement;
     this.root = root;
@@ -218,7 +220,7 @@ export default class TableBuilding extends React.Component<ComProps, any> {
    * 初始化butterfly事件
    */
   initEvents() {
-    const {config, edgeMenu} = this.props;
+    const { config, edgeMenu } = this.props;
     let isAfterSelect = false;
 
     let _addLinks = (links: any) => {
@@ -252,9 +254,10 @@ export default class TableBuilding extends React.Component<ComProps, any> {
 
       return newEdge;
     }
-    
+
     this.canvas.on('system.link.connect', (data: any) => {
       let newEdges = _addLinks(data.links || []);
+      console.log("newEdges:", newEdges);
       this.onConnectEdges(newEdges);
       this.forceUpdate();
     });
@@ -286,7 +289,7 @@ export default class TableBuilding extends React.Component<ComProps, any> {
 
     this.canvas.on('system.canvas.click', (data: any) => {
       $(this.root).attr('tabindex', 0).focus();
-      if(isAfterSelect) {
+      if (isAfterSelect) {
         return;
       }
       this._unfocus();
@@ -294,14 +297,14 @@ export default class TableBuilding extends React.Component<ComProps, any> {
       this.canvas.unfocus();
     });
 
-    this.canvas.on('system.multiple.select', ({data}) => {
+    this.canvas.on('system.multiple.select', ({ data }) => {
 
       $(this.root).attr('tabindex', 0).focus();
 
       // 加这个判断是为了防止[system.canvas.click]事件和当前事件冲突
       isAfterSelect = true;
 
-      const {nodes, edges} = data;
+      const { nodes, edges } = data;
       this._unfocus();
 
       nodes.forEach(node => {
@@ -313,14 +316,14 @@ export default class TableBuilding extends React.Component<ComProps, any> {
         edge.focus();
         this._focusLinks.push(edge);
       })
-  
+
       _.isFunction(this.props.onSelect) && this.props.onSelect(nodes, edges);
 
       // 防止误触
       setTimeout(() => {
         isAfterSelect = false;
       }, 100);
-    });    
+    });
 
     this.canvas.on('custom.node.delete', (data: any) => {
       this.onDeleteNodes([data.node]);
@@ -418,6 +421,84 @@ export default class TableBuilding extends React.Component<ComProps, any> {
 
   onConnectEdges(links) {
     let linksInfo = links.map((item) => {
+      console.log("linkInfoItem:", item);
+      const data = { ...this.props.data };
+      console.log("data:", data);
+      console.log("pdata:", this.props.data);
+      if (links) {
+        var b = 0;
+        const sn = item.sourceNode.id;
+        const tn = item.targetNode.id;
+        const s = _.get(item, 'options.source', '').replace('-right', '');
+        const t = _.get(item, 'options.target', '').replace('-left', '');
+        data.edges.forEach(function (tem) {
+          if ((tem.source == s && tem.target == t && tem.sourceNode == sn && tem.targetNode == tn))
+            b = 1;
+        });
+        if (b == 0) {
+          console.log("!tem");
+          data.edges.push({
+            "id": data.edges.length,
+            "sourceNode": sn,
+            "targetNode": tn,
+            "source": s,
+            "target": t
+          });
+
+          this.setState({
+            data: { ...data }
+          });
+        }
+      }
+      console.log("data:", data)
+      console.log("pdata:", this.props.data);
+
+
+      return _.assign(item.options, {
+        source: _.get(item, 'options.source', '').replace('-right', ''),
+        target: _.get(item, 'options.target', '').replace('-left', ''),
+        _sourceNode: item.sourceNode,
+        _targetNode: item.targetNode,
+        _sourceEndpoint: item.sourceEndpoint,
+        _targetEndpoint: item.targetEndpoint
+      });
+    });
+
+    let newEdges = _.differenceWith(linksInfo, this.canvasData.edges, (a: any, b: any) => {
+      return (
+        a.sourceNode === b.sourceNode &&
+        a.targetNode === b.targetNode &&
+        a.source === b.source &&
+        a.target === b.target
+      );
+    });
+
+    this.canvasData.edges = this.canvasData.edges.concat(newEdges);
+
+    this.props.onChange && this.props.onChange({
+      type: 'system.link.connect',
+      links: linksInfo
+    });
+  }
+
+  onConnectNewEdges(links) {
+    let linksInfo = links.map((item) => {
+      console.log("linkInfoItem:", item);
+
+      // const data = this.props.data;
+
+      // data.edges.push({
+      //   "id": data.edges.length,
+      //   "sourceNode": item.sourceNode,
+      //   "targetNode": item.targetNode,
+      //   "source": _.get(item, 'options.source', '').replace('-right', ''),
+      //   "target": _.get(item, 'options.target', '').replace('-left', '')
+      // });
+
+      // this.setState({
+      //   data: { ...data }
+      // });
+
       return _.assign(item.options, {
         source: _.get(item, 'options.source', '').replace('-right', ''),
         target: _.get(item, 'options.target', '').replace('-left', ''),
@@ -467,7 +548,7 @@ export default class TableBuilding extends React.Component<ComProps, any> {
 
   onDeleteNodes(nodes) {
 
-    let beforeDeleteNode = this.props.beforeDeleteNode || function() {return true};
+    let beforeDeleteNode = this.props.beforeDeleteNode || function () { return true };
 
     Promise.resolve(beforeDeleteNode(nodes))
       .then((result) => {
@@ -495,12 +576,12 @@ export default class TableBuilding extends React.Component<ComProps, any> {
             neighborLinks: neighborLinksInfo
           });
         }
-      }).catch(() => {});
+      }).catch(() => { });
   }
 
   onDeleteEdges(links) {
 
-    let beforeDeleteEdge = this.props.beforeDeleteEdge || function() {return true};
+    let beforeDeleteEdge = this.props.beforeDeleteEdge || function () { return true };
 
     Promise.resolve(beforeDeleteEdge(links))
       .then((result) => {
@@ -510,13 +591,13 @@ export default class TableBuilding extends React.Component<ComProps, any> {
           let linksInfo = links.map((item) => {
             return item.options;
           });
-      
+
           this.props.onChange && this.props.onChange({
             type: 'system.link.delete',
             links: linksInfo
           });
         }
-      }).catch(() => {});
+      }).catch(() => { });
   }
 
   _genClassName() {
@@ -578,12 +659,11 @@ export default class TableBuilding extends React.Component<ComProps, any> {
   }
 
   render() {
-    const {canvas} = this;
-    const {actionMenu = []} = this.props;
+    const { canvas } = this;
+    const { actionMenu = [] } = this.props;
     const actionMenuVisible = _.get(this, 'props.config.showActionIcon', true);
     const labelRender = _.get(this, 'props.config.labelRender', noop);
     const selectable = !!this.props.selectable;
-
     return (
       <div
         className={this._genClassName()}
@@ -591,7 +671,7 @@ export default class TableBuilding extends React.Component<ComProps, any> {
           cursor: selectable ? 'crosshair' : 'default'
         }}
       >
-        <ActionMenu 
+        <ActionMenu
           canvas={canvas}
           actionMenu={actionMenu}
           visible={actionMenuVisible}

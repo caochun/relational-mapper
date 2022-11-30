@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
 module.exports = {
+  stats: { children: false },
   entry: {
     app: './index.jsx'
   },
@@ -40,7 +41,7 @@ module.exports = {
             plugins: [
               '@babel/plugin-transform-runtime',
               '@babel/plugin-transform-modules-commonjs',
-              '@babel/plugin-proposal-object-rest-spread', 
+              '@babel/plugin-proposal-object-rest-spread',
               '@babel/plugin-proposal-class-properties',
             ]
           }
@@ -93,8 +94,12 @@ module.exports = {
     })
   ],
   devServer: {
+    // static: {
+    //   directory: path.join(__dirname, 'dist'),
+    // },
     contentBase: './dist', // 本地服务器所加载的页面所在的目录
     historyApiFallback: true, // 不跳转
+    //compress: true,
     inline: true, // 实时刷新
     index: 'index.html',
     port: 8080,

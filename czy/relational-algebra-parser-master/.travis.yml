@@ -1,7 +1,0 @@
-language: scala
-
-jdk: oraclejdk11
-
-scala:
-   - 2.12.8
-   
