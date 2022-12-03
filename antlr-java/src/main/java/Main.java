@@ -1,8 +1,6 @@
-import Ra.ProjInterpreter;
-import Ra.ProjectionBaseListener;
-import Ra.ProjectionLexer;
-import Ra.ProjectionParser;
-import model.LogEntry;
+import Ra.RelationalAlgebraInterpreter;
+import Ra.RelationalAlgebraLexer;
+import Ra.RelationalAlgebraParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
@@ -24,13 +22,13 @@ public class Main {
 //        LogEntry error = ((MyListener) logWalker).getEntries().get(1);
 //        return;
 
-        String projLine = "π a R";
+        String projLine = "π a π a ,b R";
         String out = "SELECT a FROM R";
-        ProjectionLexer lexer = new ProjectionLexer(CharStreams.fromString(projLine));
+        RelationalAlgebraLexer lexer = new RelationalAlgebraLexer(CharStreams.fromString(projLine));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        ProjectionParser parser = new ProjectionParser(tokens);
+        RelationalAlgebraParser parser = new RelationalAlgebraParser(tokens);
         ParseTree tree = parser.exp();
-        ProjInterpreter interpreter = new ProjInterpreter();
+        RelationalAlgebraInterpreter interpreter = new RelationalAlgebraInterpreter();
         String query = (String) interpreter.visit(tree);
         System.out.println(query);
     }
