@@ -1,10 +1,16 @@
 package ch.hepia
 
+import javax.management.MBeanAttributeInfo
+
 sealed trait Ast
 object Ast {
 
   case class RelationalId(name: String)
-  case class AttributeId(name: String)
+  sealed trait AttributeInfo
+  object AttributeInfo{
+    case class AttributeId(name: String) extends AttributeInfo
+    case class OuterAttributeInfo(name: String) extends AttributeInfo
+  }
   case class Value(value: String)
   //case class AnyPara(content : String)
 
@@ -23,9 +29,9 @@ object Ast {
   object BooleanOperator {
     case class And(left: BooleanOperator, right: BooleanOperator) extends BooleanOperator
     case class Or(left: BooleanOperator, right: BooleanOperator) extends BooleanOperator
-    case class Cond(left: AttributeId, op: Operator, right: Value) extends BooleanOperator
-    case class JoinCond(left: AttributeId, op: Operator, right: AttributeId) extends BooleanOperator
-    case class OtherCond(content: String) extends BooleanOperator
+    case class Cond(left: AttributeInfo, op: Operator, right: Value) extends BooleanOperator
+    case class JoinCond(left: AttributeInfo, op: Operator, right: AttributeInfo) extends BooleanOperator
+    case class OuterCond(name: String) extends BooleanOperator
   }
 
   sealed trait JoinType
@@ -33,6 +39,7 @@ object Ast {
     case object InnerJoin extends JoinType
     case object LeftJoin extends JoinType
     case object RightJoin extends JoinType
+    case object Union extends JoinType
   }
 
   
@@ -45,10 +52,12 @@ object Ast {
 
   sealed trait Relation extends Ast
   object Relation {
-    case class SingleRelation(name: RelationalId,anotherName: RelationalId) extends Relation
+    case class SingleRelation(name: RelationalId) extends Relation
+    case class RenameRelation(relation: Relation,anotherName: RelationalId) extends Relation
     case class Sigma(cond: BooleanOperator, relation: Relation) extends Relation
     case class RelationExpr(relation: Relation, joined: (BooleanOperator,JoinType, Relation)*) extends Relation
-    case class PiRelationExpr(attributes: Seq[AttributeId], relation: Relation) extends Relation
+    case class PiRelationExpr(attributes: Seq[AttributeInfo], relation: Relation) extends Relation
+    case class OuterRelation(name: String) extends Relation
   }
 
   //case class PiExpr(piRelationExpr: Relation.PiRelationExpr) extends Ast

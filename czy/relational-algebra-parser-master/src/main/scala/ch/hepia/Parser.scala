@@ -10,7 +10,7 @@ import ch.hepia.Ast.Relation.SingleRelation
 object Parser {
 
   def value[_: P]: P[Value] = CharIn("a-zA-Z0-9_").rep(1).!.map( Value )
-  def valueStrContent[_: P] = CharIn("a-zA-Z0-9_#{}").rep(1)
+  def valueStrContent[_: P] = CharIn("a-zA-Z0-9_#{}").rep
   def strValue[_: P] = P(
     for {
       _ <- P("'")
@@ -27,54 +27,55 @@ object Parser {
     } yield Value("'"+content+"'")
   )
 
-  def fieldName[_: P] = CharIn("a-zA-Z0-9_").rep(1).!.map{ case(n) => (RelationalId(n),RelationalId("")) }
+  def fieldName[_: P]:P[Relation] = CharIn("a-zA-Z0-9_").rep(1).!.map{ case(n) => SingleRelation(RelationalId(n)) }
 
-  def renamedField[_: P] = P(
-    for {
-      _ <- P("renamedField(")
-      name1 <- fieldName.!
-      _ <- P(",")
-      name2 <- fieldName.!
-      _ <- P(")")
-    } yield (RelationalId(name1),RelationalId(name2))
-  )
+  def renamedField[_: P]:P[(Relation,RelationalId)] = P("renamedField("~(originExpr)~","~(fieldName.!)~")").map{case(rel,anName) => (rel,RelationalId(anName))}
+
 
   //def anyPara[_: P] = CharIn(" !-}\n\t\127-\255").rep(1)
   def anyPara[_: P] = CharsWhile(_ != 'Ω').!
 
-  def fieldNameInOtherLanguage[_: P] = P(
+  def fieldNameInOtherLanguage[_: P]:P[Relation] = P(
     for {
-      _ <- P("fieldNameInOtherLanguage<α")
-      content <- anyPara.!
-      _ <- P("Ω>")
-    } yield (RelationalId(content),RelationalId(""))
+      _ <- P("fieldNameInOtherLanguage<")
+      content <- attributeName.!
+      _ <- P(">")
+    } yield Ast.Relation.OuterRelation(content)
   )
 
   def idName[_: P] = CharIn("a-zA-Z0-9_").rep(1)
 
   def capitalizedIdName[_: P] = CharIn("A-Z") ~ CharIn("a-z").rep
 
-  def attributeName[_: P] = P( idName.!).map(AttributeId)
+  def attributeName[_: P] = P( idName.!).map(AttributeInfo.AttributeId)
 
   def attributeNameWithField[_: P] = P(
     for {
       id1 <- fieldName.!
       _ <- P(".")
       id2 <- idName.!
-    } yield AttributeId(id1+"."+id2)
+    } yield AttributeInfo.AttributeId(id1+"."+id2)
   )
   def rename[_: P] = P(
     for {
-      id1 <- (attributeNameWithField|attributeName).!
+      id1 <- (attriInfoInOtherLanguage|attributeNameWithField|attributeName|value|strValue).!
       _ <- P(" as ")
       id2 <- idName.!
-    } yield AttributeId(id1+"."+id2)
+    } yield AttributeInfo.AttributeId(id1+" AS "+id2)
   )
 
-  def singleRelation[_: P]: P[SingleRelation] = P( (fieldNameInOtherLanguage|renamedField|fieldName) ).map{case (name1,name2) => Ast.Relation.SingleRelation(name1,name2)}
+  def attriInfoInOtherLanguage[_: P] = P(
+    for {
+      _ <- P("attriInfoInOtherLanguage<")
+      name <- attributeName.!
+      _ <- P(">")
+    } yield AttributeInfo.OuterAttributeInfo(name)
+  )
+
+  def renameRelation[_: P]: P[Ast.Relation.RenameRelation] = P( (renamedField) ).map{case (name1,name2) => Ast.Relation.RenameRelation(name1,name2)}
 
   def funcArguments[_: P] =
-    P( " ".rep ~ (rename|attributeNameWithField|attributeName).!.rep(sep=" ".rep ~ "," ~ " ".rep./) ).map(seqs => seqs.map( AttributeId ) )
+    P( " ".rep ~ (rename|attriInfoInOtherLanguage|attributeNameWithField|attributeName).rep(sep=" ".rep ~ "," ~ " ".rep./) ).map(seqs => seqs )
 
   def eqJoinCond[_: P] = P(
     for {
@@ -92,8 +93,14 @@ object Parser {
     } yield (le,JoinType.LeftJoin)
   )
 
+  def unionCond[_: P] = P(
+    for {
+      _ <- P(" union ")
+    } yield (Ast.BooleanOperator.OuterCond(""),JoinType.Union)
+  )
+
   def originExpr[_: P]: P[Relation.RelationExpr] =
-    P((piRelationExpr|sigmaExpr|singleRelation) ~ ((eqJoinCond|eqLeftJoinCond) ~ relationExpr).rep).map {
+    P(relationExpr ~ ((eqJoinCond|eqLeftJoinCond|unionCond) ~ relationExpr).rep).map {
       case (sr, joined) => Relation.RelationExpr(sr, joined:_*)
     } 
 
@@ -106,9 +113,9 @@ object Parser {
   def inEqSign[_: P]: P[Operator] = P(">=").!.map(_ => Operator.In )
   def sign[_: P]: P[Operator] = P( " " ~ (neqSign|eqSign|bigEqSign|lessEqSign|bigSign|lessSign|inEqSign) ~ " " )
 
-  def comparisonExpr[_: P]: P[Cond] = P( (attributeNameWithField|attributeName) ~ sign ~ (strValue|value) ).map { case (a, s, v) => Cond(a, s, v) }
-  def joinComparisonExpr[_: P]: P[BooleanOperator] = P( (attributeNameWithField|attributeName) ~ sign ~ (attributeNameWithField|attributeName) ).map { case (a1, s, a2) => Ast.BooleanOperator.JoinCond(a1, s, a2) }
-  def otherCondExpr[_: P]: P[BooleanOperator] = P( "otherCond<α"~" ".rep~ anyPara ~"Ω>" ).map { case (a) => Ast.BooleanOperator.OtherCond(a) }
+  def comparisonExpr[_: P]: P[Cond] = P( (attriInfoInOtherLanguage|attributeNameWithField|attributeName) ~ sign ~ (strValue|value) ).map { case (a, s, v) => Cond(a, s, v) }
+  def joinComparisonExpr[_: P]: P[BooleanOperator] = P( (attriInfoInOtherLanguage|attributeNameWithField|attributeName) ~ sign ~ (attributeNameWithField|attributeName) ).map { case (a1, s, a2) => Ast.BooleanOperator.JoinCond(a1, s, a2) }
+  def otherCondExpr[_: P]: P[BooleanOperator] = P( "otherCond<"~" ".rep~ (attributeName.!) ~">" ).map { case (a) => Ast.BooleanOperator.OuterCond(a) }
   def logicFactor[_: P]: P[BooleanOperator] = otherCondExpr|joinComparisonExpr|comparisonExpr
   def orTerm[_: P]: P[BooleanOperator] = P( logicFactor ~ " or " ~ logicTerm ).map {case (t, lf) => Ast.BooleanOperator.Or(t,lf)}
   def logicTerm[_: P]: P[BooleanOperator] = P( orTerm | logicFactor )
@@ -118,7 +125,7 @@ object Parser {
   def sigmaExpr[_: P]: P[Relation] = P( "sigma(" ~ logicExpr ~ ")(" ~ originExpr ~ ")" ).map { case (logicOp, rel) => Relation.Sigma(logicOp, rel) }
 
   def piRelationExpr[_: P]: P[Relation] = P("pi(" ~ funcArguments ~ ")(" ~ relationExpr ~ ")").map { case (attrs, rel) => Relation.PiRelationExpr(attrs, rel) }
-  def relationExpr[_: P]: P[Relation] = P( piRelationExpr|sigmaExpr|originExpr )
+  def relationExpr[_: P]: P[Relation] = P( fieldNameInOtherLanguage|piRelationExpr|sigmaExpr|renameRelation|fieldName )
 
   //def piExpr[_: P]: P[PiExpr]  = P(piRelationExpr).map { case (pi) => PiExpr(pi) }
 
