@@ -64,6 +64,30 @@ public class RelationalAlgebraBaseListener implements RelationalAlgebraListener 
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterGroupby(RelationalAlgebraParser.GroupbyContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitGroupby(RelationalAlgebraParser.GroupbyContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterUnion(RelationalAlgebraParser.UnionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUnion(RelationalAlgebraParser.UnionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterRelation(RelationalAlgebraParser.RelationContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -71,6 +95,18 @@ public class RelationalAlgebraBaseListener implements RelationalAlgebraListener 
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitRelation(RelationalAlgebraParser.RelationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterGroupbyExp(RelationalAlgebraParser.GroupbyExpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitGroupbyExp(RelationalAlgebraParser.GroupbyExpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -107,18 +143,6 @@ public class RelationalAlgebraBaseListener implements RelationalAlgebraListener 
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitNewAttribute(RelationalAlgebraParser.NewAttributeContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterNewTableName(RelationalAlgebraParser.NewTableNameContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitNewTableName(RelationalAlgebraParser.NewTableNameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -215,6 +239,42 @@ public class RelationalAlgebraBaseListener implements RelationalAlgebraListener 
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitAttribute(RelationalAlgebraParser.AttributeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDialect(RelationalAlgebraParser.DialectContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDialect(RelationalAlgebraParser.DialectContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCasestmts(RelationalAlgebraParser.CasestmtsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCasestmts(RelationalAlgebraParser.CasestmtsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCasestmt(RelationalAlgebraParser.CasestmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCasestmt(RelationalAlgebraParser.CasestmtContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

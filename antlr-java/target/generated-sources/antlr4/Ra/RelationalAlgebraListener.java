@@ -56,6 +56,30 @@ public interface RelationalAlgebraListener extends ParseTreeListener {
 	 */
 	void exitProjection(RelationalAlgebraParser.ProjectionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code groupby}
+	 * labeled alternative in {@link RelationalAlgebraParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void enterGroupby(RelationalAlgebraParser.GroupbyContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code groupby}
+	 * labeled alternative in {@link RelationalAlgebraParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void exitGroupby(RelationalAlgebraParser.GroupbyContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code union}
+	 * labeled alternative in {@link RelationalAlgebraParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnion(RelationalAlgebraParser.UnionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code union}
+	 * labeled alternative in {@link RelationalAlgebraParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnion(RelationalAlgebraParser.UnionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code relation}
 	 * labeled alternative in {@link RelationalAlgebraParser#exp}.
 	 * @param ctx the parse tree
@@ -67,6 +91,16 @@ public interface RelationalAlgebraListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitRelation(RelationalAlgebraParser.RelationContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link RelationalAlgebraParser#groupbyExp}.
+	 * @param ctx the parse tree
+	 */
+	void enterGroupbyExp(RelationalAlgebraParser.GroupbyExpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link RelationalAlgebraParser#groupbyExp}.
+	 * @param ctx the parse tree
+	 */
+	void exitGroupbyExp(RelationalAlgebraParser.GroupbyExpContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link RelationalAlgebraParser#renameExp}.
 	 * @param ctx the parse tree
@@ -97,16 +131,6 @@ public interface RelationalAlgebraListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNewAttribute(RelationalAlgebraParser.NewAttributeContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link RelationalAlgebraParser#newTableName}.
-	 * @param ctx the parse tree
-	 */
-	void enterNewTableName(RelationalAlgebraParser.NewTableNameContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link RelationalAlgebraParser#newTableName}.
-	 * @param ctx the parse tree
-	 */
-	void exitNewTableName(RelationalAlgebraParser.NewTableNameContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link RelationalAlgebraParser#leftJoinExp}.
 	 * @param ctx the parse tree
@@ -187,6 +211,36 @@ public interface RelationalAlgebraListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAttribute(RelationalAlgebraParser.AttributeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link RelationalAlgebraParser#dialect}.
+	 * @param ctx the parse tree
+	 */
+	void enterDialect(RelationalAlgebraParser.DialectContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link RelationalAlgebraParser#dialect}.
+	 * @param ctx the parse tree
+	 */
+	void exitDialect(RelationalAlgebraParser.DialectContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link RelationalAlgebraParser#casestmts}.
+	 * @param ctx the parse tree
+	 */
+	void enterCasestmts(RelationalAlgebraParser.CasestmtsContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link RelationalAlgebraParser#casestmts}.
+	 * @param ctx the parse tree
+	 */
+	void exitCasestmts(RelationalAlgebraParser.CasestmtsContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link RelationalAlgebraParser#casestmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterCasestmt(RelationalAlgebraParser.CasestmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link RelationalAlgebraParser#casestmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitCasestmt(RelationalAlgebraParser.CasestmtContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link RelationalAlgebraParser#constVar}.
 	 * @param ctx the parse tree

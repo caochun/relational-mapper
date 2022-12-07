@@ -39,12 +39,32 @@ public interface RelationalAlgebraVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProjection(RelationalAlgebraParser.ProjectionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code groupby}
+	 * labeled alternative in {@link RelationalAlgebraParser#exp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitGroupby(RelationalAlgebraParser.GroupbyContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code union}
+	 * labeled alternative in {@link RelationalAlgebraParser#exp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitUnion(RelationalAlgebraParser.UnionContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code relation}
 	 * labeled alternative in {@link RelationalAlgebraParser#exp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitRelation(RelationalAlgebraParser.RelationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link RelationalAlgebraParser#groupbyExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitGroupbyExp(RelationalAlgebraParser.GroupbyExpContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link RelationalAlgebraParser#renameExp}.
 	 * @param ctx the parse tree
@@ -63,12 +83,6 @@ public interface RelationalAlgebraVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitNewAttribute(RelationalAlgebraParser.NewAttributeContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link RelationalAlgebraParser#newTableName}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitNewTableName(RelationalAlgebraParser.NewTableNameContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link RelationalAlgebraParser#leftJoinExp}.
 	 * @param ctx the parse tree
@@ -117,6 +131,24 @@ public interface RelationalAlgebraVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitAttribute(RelationalAlgebraParser.AttributeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link RelationalAlgebraParser#dialect}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDialect(RelationalAlgebraParser.DialectContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link RelationalAlgebraParser#casestmts}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCasestmts(RelationalAlgebraParser.CasestmtsContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link RelationalAlgebraParser#casestmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCasestmt(RelationalAlgebraParser.CasestmtContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link RelationalAlgebraParser#constVar}.
 	 * @param ctx the parse tree

@@ -11,6 +11,48 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class SimpleTest {
 
     @Test
+    void testGroupByWithSelection(){
+        String line = " γ a, b σ a = 0 R";
+        String out = "SELECT * FROM R WHERE a=0 GROUP BY a , b";
+        RelationalAlgebraLexer lexer = new RelationalAlgebraLexer(CharStreams.fromString(line));
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        RelationalAlgebraParser parser = new RelationalAlgebraParser(tokens);
+        ParseTree tree = parser.exp();
+        RelationalAlgebraInterpreter interpreter = new RelationalAlgebraInterpreter();
+        String query = (String) interpreter.visit(tree);
+        System.out.println(query);
+        assertEquals(out, query);
+    }
+
+    @Test
+    void testGroupBy(){
+        String line = "γ a, b R";
+        String out = "SELECT * FROM R GROUP BY a , b";
+        RelationalAlgebraLexer lexer = new RelationalAlgebraLexer(CharStreams.fromString(line));
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        RelationalAlgebraParser parser = new RelationalAlgebraParser(tokens);
+        ParseTree tree = parser.exp();
+        RelationalAlgebraInterpreter interpreter = new RelationalAlgebraInterpreter();
+        String query = (String) interpreter.visit(tree);
+        System.out.println(query);
+        assertEquals(out, query);
+    }
+
+    @Test
+    void testCaseWhen(){
+        String line = "ρ ψ(a=b, a; a=c, '1'; b) t R";
+        String out = "SELECT CASE WHEN a=b THEN a WHEN a=c THEN '1' ELSE b END t FROM R";
+        RelationalAlgebraLexer lexer = new RelationalAlgebraLexer(CharStreams.fromString(line));
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        RelationalAlgebraParser parser = new RelationalAlgebraParser(tokens);
+        ParseTree tree = parser.exp();
+        RelationalAlgebraInterpreter interpreter = new RelationalAlgebraInterpreter();
+        String query = (String) interpreter.visit(tree);
+        System.out.println(query);
+        assertEquals(out, query);
+    }
+
+    @Test
     public void testSimpleProjection(){
         String line = "π a R";
         String out = "SELECT a FROM R";
@@ -110,7 +152,7 @@ public class SimpleTest {
     @Test
     public void testTableAccess(){
         String line = "π R.a, R.c R";
-        String out = "SELECT R.a,R.c FROM R";
+        String out = "SELECT R.a , R.c FROM R";
         RelationalAlgebraLexer lexer = new RelationalAlgebraLexer(CharStreams.fromString(line));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         RelationalAlgebraParser parser = new RelationalAlgebraParser(tokens);
@@ -123,8 +165,8 @@ public class SimpleTest {
 
     @Test
     public void testRename(){
-        String line = "ρ t a a1, c c1, id id1 R";
-        String out = "SELECT a a1 , c c1 , id id1 FROM ( SELECT * FROM R ) AS t";
+        String line = "ρ a a1, c c1, id id1 R";
+        String out = "SELECT a a1 , c c1 , id id1 FROM R";
         RelationalAlgebraLexer lexer = new RelationalAlgebraLexer(CharStreams.fromString(line));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         RelationalAlgebraParser parser = new RelationalAlgebraParser(tokens);

@@ -1,11 +1,16 @@
 grammar RelationalAlgebra;
 
-//SELECTION : 'σ t a a1, c c1, id id1 R';
+//SELECTION : 'σ';
 //PROJECTION : 'π';
 //LEFTJOIN : '⟕' // different form left outer join
 //AND : '∧';
 //OR : '∨';
 //RENAME : 'ρ';
+//LIKE : 'λ'
+//FUNCTION 'ƒ'
+//CASE : 'ψ';
+//GROUPBY : 'γ'
+//UNION : '∪';
 
 exp :
     selectionExp #selection
@@ -13,10 +18,16 @@ exp :
     | exp leftJoinExp exp #leftjoin
     | renameExp exp #rename
     | STRING #relation
+    | groupbyExp exp #groupby
+    | exp UNION exp #union
     ;
 
+groupbyExp :
+    GROUP_BY attributes
+;
+
 renameExp :
-    RENAME newTableName newAttributes // user can rename the attributes like a.b, we wont take care of this
+    RENAME newAttributes // user can rename the attributes like a.b, we wont take care of this
     ;
 
 newAttributes :
@@ -28,13 +39,13 @@ newAttribute :
     | constString STRING
 ;
 
-newTableName :
-    STRING
-    ;
+//newTableName :
+//    STRING
+//    ;
 
 leftJoinExp :
-    LEFTOUTERJOIN // this won't work on specific sql release version
-    | LEFTOUTERJOIN conditions
+    LEFT_OUTER_JOIN // this won't work on specific sql release version
+    | LEFT_OUTER_JOIN conditions
     ;
 
 projectionExp :
@@ -70,7 +81,22 @@ logicOp:
 attribute :
     STRING DOT STRING
     | STRING
-    ;
+    | CASE LP casestmts RP
+    | dialect
+;
+
+dialect :
+    DIALECT LP NUMBER RP
+;
+
+casestmts :
+    casestmt SEMI attribute
+    | casestmt SEMI casestmts
+;
+
+casestmt :
+    conditions COMMA attribute
+;
 
 constVar :
     NUMBER
@@ -78,27 +104,29 @@ constVar :
     ;
 
 constString :
-    SINGLEQUOTA STRING SINGLEQUOTA
+    SINGLE_QUOTA STRING SINGLE_QUOTA
     ;
-
-
-RELOP : ('>'|'>='|'<'|'<='|'='|'!=');
+UNION : '∪';
+GROUP_BY: 'γ';
+DIALECT : 'ƒ';
+CASE : 'ψ';
+RELOP : ('>'|'>='|'<'|'<='|'='|'!='|'λ');
 RENAME : 'ρ';
 SELECTION : 'σ';
 PROJECTION : 'π';
-LEFTOUTERJOIN : '⟕';
+LEFT_OUTER_JOIN : '⟕';
 AND : '∧';
 OR : '∨';
 DOT : '.';
 COMMA : ',';
 QUOTA : '"';
-SINGLEQUOTA : '\'';
+SINGLE_QUOTA : '\'';
 LP : '(';
 RP : ')';
 SEMI : ';';
 
 NUMBER : [0-9]+ ;
-STRING : [a-zA-Z0-9_'*]+ ;
+STRING : [\u4e00-\u9fa5a-zA-Z0-9_'%{}#*]+ ;
 
 
 

@@ -1,7 +1,9 @@
 Ra/RelationalAlgebraParser.class
 Ra/RelationalAlgebraParser$ConditionContext.class
+Ra/RelationalAlgebraParser$GroupbyExpContext.class
 Ra/RelationalAlgebraBaseVisitor.class
 Ra/RelationalAlgebraParser$LogicOpContext.class
+Ra/RelationalAlgebraParser$UnionContext.class
 Ra/RelationalAlgebraParser$SelectionContext.class
 Main.class
 Ra/RelationalAlgebraParser$LeftjoinContext.class
@@ -10,11 +12,15 @@ Ra/RelationalAlgebraParser$AttributesContext.class
 Ra/RelationalAlgebraParser$ConditionsContext.class
 Ra/RelationalAlgebraParser$ConstVarContext.class
 Ra/RelationalAlgebraParser$ProjectionExpContext.class
+Ra/RelationalAlgebraParser$CasestmtContext.class
 Ra/RelationalAlgebraParser$ConstStringContext.class
+Ra/RelationalAlgebraParser$GroupbyContext.class
 Ra/RelationalAlgebraParser$LeftJoinExpContext.class
 Ra/RelationalAlgebraParser$RelationContext.class
 Ra/RelationalAlgebraBaseListener.class
+Ra/RelationalAlgebraParser$DialectContext.class
 Ra/RelationalAlgebraParser$NewAttributesContext.class
+Ra/RelationalAlgebraParser$CasestmtsContext.class
 Ra/RelationalAlgebraListener.class
 Ra/RelationalAlgebraParser$ExpContext.class
 Ra/RelationalAlgebraParser$RenameContext.class
@@ -22,7 +28,6 @@ Ra/RelationalAlgebraInterpreter.class
 Ra/RelationalAlgebraVisitor.class
 Ra/RelationalAlgebraParser$ProjectionContext.class
 Ra/RelationalAlgebraLexer.class
-Ra/RelationalAlgebraParser$NewTableNameContext.class
 Ra/RelationalAlgebraParser$NewAttributeContext.class
 Ra/RelationalAlgebraParser$SelectionExpContext.class
 Ra/RelationalAlgebraParser$RenameExpContext.class
