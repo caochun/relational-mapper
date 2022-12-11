@@ -92,10 +92,11 @@ interface ComProps {
   onChange(data: any): void,                        // 图内数据变化事件
   onFocusNode(node: any): void,                     // 聚焦节点事件
   onFocusEdge(edge: any): void,                     // 聚焦线段事件
+  onFocusLabel(label: any): void,                     // 聚焦线段事件
   onFocusCanvas(): void,                            // 聚焦空白处事件
   onDblClickNode?(node: any): void,                 // 双击节点事件
   onDblClickEdge?(edge: any): void,                 // 双击线段事件
-  onSelect(nodes: any, edges: any): void,           // 选中事件
+  onSelect(nodes: any, edges: any, labels: any): void,           // 选中事件
 
   // TODO: 展开/收缩节点
   // onDeleteNodes(nodeInfo: any): void,
@@ -113,6 +114,7 @@ export default class TableBuilding extends React.Component<ComProps, any> {
   private _focusNodes: any;
   private _columns: any;
   private _focusLinks: any;
+  private _focuslabels: any;
   private _enableHoverChain: any;
   private _enableFocusChain: any;
   private root: any;
@@ -126,6 +128,7 @@ export default class TableBuilding extends React.Component<ComProps, any> {
 
     this._focusNodes = [];
     this._focusLinks = [];
+    this._focuslabels = [];
 
     this._enableHoverChain = _.get(props, 'config.enableHoverChain', true);
     this._enableFocusChain = _.get(props, 'config.enableFocusChain', false);
@@ -233,6 +236,8 @@ export default class TableBuilding extends React.Component<ComProps, any> {
           id: item.options.id || `${item.options.sourceNode}-${_oldSource}-${item.options.targetNode}-${_oldTarget}`,
           sourceNode: item.options.sourceNode,
           targetNode: item.options.targetNode,
+          sourceNodeD: item.options.sourceNodeD,
+          targetNodeD: item.options.targetNodeD,
           arrowShapeType: item.arrowShapeType,
           source: _newSource,
           target: _newTarget,
@@ -286,6 +291,10 @@ export default class TableBuilding extends React.Component<ComProps, any> {
       $(this.root).attr('tabindex', 0).focus();
       this._focusLink(data.edge);
     });
+    this.canvas.on('system.label.click', (data: any) => {
+      $(this.root).attr('tabindex', 0).focus();
+      this._focuslabels(data.label);
+    });
 
     this.canvas.on('system.canvas.click', (data: any) => {
       $(this.root).attr('tabindex', 0).focus();
@@ -304,7 +313,7 @@ export default class TableBuilding extends React.Component<ComProps, any> {
       // 加这个判断是为了防止[system.canvas.click]事件和当前事件冲突
       isAfterSelect = true;
 
-      const { nodes, edges } = data;
+      const { nodes, edges, labels } = data;
       this._unfocus();
 
       nodes.forEach(node => {
@@ -316,8 +325,12 @@ export default class TableBuilding extends React.Component<ComProps, any> {
         edge.focus();
         this._focusLinks.push(edge);
       })
+      labels.forEach(label => {
+        label.focus();
+        this._focuslabels.push(label);
+      })
 
-      _.isFunction(this.props.onSelect) && this.props.onSelect(nodes, edges);
+      _.isFunction(this.props.onSelect) && this.props.onSelect(nodes, edges, labels);
 
       // 防止误触
       setTimeout(() => {
@@ -333,6 +346,7 @@ export default class TableBuilding extends React.Component<ComProps, any> {
       this._unfocus();
       this._focusNodes = this._focusNodes.concat(data.nodes || []);
       this._focusLinks = this._focusLinks.concat(data.edges || []);
+      this._focuslabels = this._focuslabels.concat(data.labels || []);
 
     });
 
@@ -429,6 +443,8 @@ export default class TableBuilding extends React.Component<ComProps, any> {
         var b = 0;
         const sn = item.sourceNode.id;
         const tn = item.targetNode.id;
+        const snd = item.sourceNode.title;
+        const tnd = item.targetNode.title;
         const s = _.get(item, 'options.source', '').replace('-right', '');
         const t = _.get(item, 'options.target', '').replace('-left', '');
         data.edges.forEach(function (tem) {
@@ -441,6 +457,8 @@ export default class TableBuilding extends React.Component<ComProps, any> {
             "id": data.edges.length,
             "sourceNode": sn,
             "targetNode": tn,
+            "sourceNodeD": snd,
+            "targetNodeD": tnd,
             "source": s,
             "target": t
           });
@@ -459,6 +477,8 @@ export default class TableBuilding extends React.Component<ComProps, any> {
         target: _.get(item, 'options.target', '').replace('-left', ''),
         _sourceNode: item.sourceNode,
         _targetNode: item.targetNode,
+        _sourceNodeD: item.sourceNodeD,
+        _targetNodeD: item.targetNodeD,
         _sourceEndpoint: item.sourceEndpoint,
         _targetEndpoint: item.targetEndpoint
       });
@@ -504,6 +524,8 @@ export default class TableBuilding extends React.Component<ComProps, any> {
         target: _.get(item, 'options.target', '').replace('-left', ''),
         _sourceNode: item.sourceNode,
         _targetNode: item.targetNode,
+        _sourceNodeD: item.sourceNodeD,
+        _targetNodeD: item.targetNodeD,
         _sourceEndpoint: item.sourceEndpoint,
         _targetEndpoint: item.targetEndpoint
       });
@@ -619,6 +641,12 @@ export default class TableBuilding extends React.Component<ComProps, any> {
     this._focusLinks.push(edge);
     this.props.onFocusEdge && this.props.onFocusEdge(edge);
   }
+  _focuslabel(label) {
+    this._unfocus();
+    label.focus();
+    this._focuslabels.push(label);
+    this.props.onFocusLabel && this.props.onFocuslabel(label);
+  }
 
   // 失焦
   _unfocus() {
@@ -629,9 +657,13 @@ export default class TableBuilding extends React.Component<ComProps, any> {
     this._focusLinks.forEach((item) => {
       item.unfocus();
     });
+    this._focuslabels.forEach((item) => {
+      item.unfocus();
+    });
 
     this._focusNodes = [];
     this._focusLinks = [];
+    this._focuslabels = [];
   }
 
   _deleteFocusItem(e) {

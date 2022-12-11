@@ -98,16 +98,30 @@ class Component extends React.Component {
     });
   }
 
-  onEditEdge = () => {
-    const data = this.state.data;
-    console.log(data.edges.length);
-    data.edges.push({
-      "id": data.edges.length,
-      "sourceNode": "aaa",
-      "targetNode": "bbb",
-      "source": "x",
-      "target": "left_join"
-    });
+  onEditEdge = (key) => {
+    console.log("key:", key)
+    console.log("onEditEdge");
+    const inpVal = this.input.value;
+    const data = { ...this.state.data };
+    var temp = [];
+    var t;
+    t = data.edges.pop();
+    while (t) {
+      if (t.source != key.source || t.target != key.target || t.sourceNode != key.sourceNode || t.targetNode != key.targetNode) {
+        temp.push(t);
+        t = data.edges.pop();
+      }
+      else {
+        t.label = inpVal;
+        temp.push(t);
+        t = data.edges.pop();
+      }
+    }
+    t = temp.pop();
+    while (t) {
+      data.edges.push(t);
+      t = temp.pop();
+    }
 
     this.setState({
       data: { ...data }
@@ -121,8 +135,10 @@ class Component extends React.Component {
       "id": data.edges.length,
       "sourceNode": "aaa",
       "targetNode": "bbb",
-      "source": "x",
-      "target": "left_join"
+      "sourceNodeD": "aaa",
+      "targetNodeD": "bbb",
+      "source": "result",
+      "target": "leftJoin"
     });
 
     this.setState({
@@ -161,6 +177,55 @@ class Component extends React.Component {
     });
   }
 
+  onEditNode = (key) => {
+    console.log("key:", key)
+    console.log("onEditNode");
+    const inpVal = this.input.value;
+    const data = { ...this.state.data };
+    var temp = [];
+    var t;
+    t = data.nodes.pop();
+    while (t) {
+      if (t.id != key.id || t.title != key.title || t.top != key.top || t.left != key.left) {
+        temp.push(t);
+        t = data.nodes.pop();
+      }
+      else {
+        t.title = inpVal;
+        temp.push(t);
+        t = data.nodes.pop();
+      }
+    }
+    t = temp.pop();
+    while (t) {
+      data.nodes.push(t);
+      t = temp.pop();
+    }
+
+    this.setState({
+      data: { ...data }
+    });
+  }
+  onEditCol = (key) => {
+    console.log("key:", key)
+    console.log("onEditCol");
+    const inpVal = this.input.value;
+    const data = { ...this.state.data };
+    data.nodes.find(m => {
+      return m.id == key.id;
+    }).fields.push({
+      "id": inpVal,
+      "type": "string",
+      "desc": "自定义操作"
+    });
+    console.log("data", data);
+
+    console.log("onEditCol finish");
+    this.setState({
+      data: { ...data }
+    });
+  }
+
   onDelxNode = (key) => {
     console.log("key:", key)
     console.log("onDelxNode");
@@ -185,27 +250,50 @@ class Component extends React.Component {
 
   onAddNode = () => {
     const data = this.state.data;
-
+    console.log("onAddNode");
+    console.log("data", data);
+    console.log("data.nodes.length", data.nodes.length);
     data.nodes.push({
       "top": 50,
       "left": 1000,
       "id": data.nodes.length,
-      "title": "test",
+      "title": data.nodes.length,
+      "label": data.nodes.length,
       "fields": [
         {
-          "id": "x",
+          "id": "result",
           "type": "string",
-          "desc": "笛卡尔乘积"
+          "desc": "结果"
         },
         {
-          "id": "left_join",
+          "id": "leftJoin",
           "type": "string",
-          "desc": "左连接"
+          "desc": "左关联"
         },
         {
-          "id": "right_join",
+          "id": "innerJoin",
           "type": "string",
-          "desc": "右链接"
+          "desc": "内关联"
+        },
+        {
+          "id": "pi",
+          "type": "string",
+          "desc": "投影"
+        },
+        {
+          "id": "sigma",
+          "type": "string",
+          "desc": "选择"
+        },
+        {
+          "id": "renamedField",
+          "type": "string",
+          "desc": "重命名"
+        },
+        {
+          "id": "fieldNameInOtherLanguage",
+          "type": "string",
+          "desc": "表"
         }
       ]
     });
@@ -225,20 +313,89 @@ class Component extends React.Component {
     });
   }
   onCreateRes = () => {
+    console.log('this_state_data:', this.state.data);
     const data = { ...this.state.data };
     console.log('dataini:', data);
     var res = "";
     console.log('resini:', res);
-    res = res + data.edges[0].sourceNode;
 
     data.edges.forEach(function (temp) {
       console.log('temps:', temp.sourceNode);
       console.log('tempt:', temp.targetNode);
-      res = res + " " + temp.source + " " + temp.targetNode;
+      console.log('findsrc:', data.nodes.find(m => {
+        return m.id == temp.sourceNode;
+      }));
+      console.log('findtar:', data.nodes.find(m => {
+        return m.id == temp.targetNode;
+      }));
+      switch (temp.source) {
+        case "result":
+          data.nodes.find(m => {
+            return m.id == temp.targetNode;
+          }).label = data.nodes.find(m => {
+            return m.id == temp.sourceNode;
+          }).label;
+          break;
+        case "pi":
+          res = temp.source + "(" + temp.label + ")(" + data.nodes.find(m => {
+            return m.id == temp.sourceNode;
+          }).label + ")";
+          data.nodes.find(m => {
+            return m.id == temp.targetNode;
+          }).label = res;
+          break;
+        case "sigma":
+          res = temp.source + "(" + temp.label + ")(" + data.nodes.find(m => {
+            return m.id == temp.sourceNode;
+          }).label + ")";
+          data.nodes.find(m => {
+            return m.id == temp.targetNode;
+          }).label = res;
+          break;
+        case "renamedField":
+          res = temp.source + "(" + data.nodes.find(m => {
+            return m.id == temp.sourceNode;
+          }).label + "," + temp.label + ")";
+          data.nodes.find(m => {
+            return m.id == temp.targetNode;
+          }).label = res;
+          break;
+        case "fieldNameInOtherLanguage":
+          res = temp.source + "<" + data.nodes.find(m => {
+            return m.id == temp.sourceNode;
+          }).label + ">";
+          data.nodes.find(m => {
+            return m.id == temp.targetNode;
+          }).label = res;
+          break;
+        default:
+          if (!temp.label) {
+            res = data.nodes.find(m => {
+              return m.id == temp.sourceNode;
+            }).label + " " + temp.source + " " + data.nodes.find(m => {
+              return m.id == temp.targetNode;
+            }).label;
+            data.nodes.find(m => {
+              return m.id == temp.targetNode;
+            }).label = res;
+          }
+          else {
+            res = data.nodes.find(m => {
+              return m.id == temp.sourceNode;
+            }).label + " " + temp.source + "(" + temp.label + ") " + data.nodes.find(m => {
+              return m.id == temp.targetNode;
+            }).label;
+            data.nodes.find(m => {
+              return m.id == temp.targetNode;
+            }).label = res;
+          }
+      }
       console.log('resplus:', res);
       console.log('tempafter:', temp);
     });
-
+    data.nodes.forEach(function (temp) {
+      temp.label = temp.title;
+    });
     // var temp = data.edges.pop()
     // console.log('tempini:', temp);
     // while (temp) {
@@ -265,7 +422,7 @@ class Component extends React.Component {
     const { selectable } = this.state;
 
     return (
-      <TableBuilding
+      <><TableBuilding
         // =========== 画布事件 ===========
         beforeLoad={(utils) => {
           // 自定义注册箭头
@@ -290,23 +447,23 @@ class Component extends React.Component {
         columns={this.state.columns}
         data={this.state.data}
         onDblClickNode={(node) => { }}
-        emptyContent={
-          <div className="empty-content">
-            <p className="desc">暂无数据</p>
-            <p
-              className="add-field"
-              onClick={(e) => {
-                e.stopPropagation();
-                console.log('自定义空状态');
-              }}
-            >
-              + 添加字段
-            </p>
-          </div>
-        }
+        emptyContent={<div className="empty-content">
+          <p className="desc">暂无数据</p>
+          <p
+            className="add-field"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log('自定义空状态');
+            }}
+          >
+            + 添加字段
+          </p>
+        </div>}
 
         // =========== 菜单相关属性 ===========
         nodeMenu={nodeMenu({
+          onEditNode: this.onEditNode,
+          onEditCol: this.onEditCol,
           onDelxNode: this.onDelxNode
         })}
         edgeMenu={edgeMenu({
@@ -337,7 +494,7 @@ class Component extends React.Component {
         onSelect={() => {
           this.setState({
             selectable: false
-          })
+          });
         }}
 
         beforeDeleteNode={(nodes) => {
@@ -346,8 +503,8 @@ class Component extends React.Component {
         beforeDeleteEdge={(edges) => {
           console.log(edges);
           // 返回false或者Promise.reject则不会删除
-        }}
-      />
+        }} /><div>
+          <input type="text" ref={input => this.input = input} defaultValue="test"></input></div></>
     )
   }
 }

@@ -1,0 +1,1 @@
+pi(T.JRXKZH,T.YGKBZ as YGBZ,T.CJRQ)(pi('' as JRXKZH,CG1.OO_NO as NBJGH,attriInfoInOtherLanguage<attr1>,'#{ETL_DT}' as CJRQ)(renamedField(sigma(otherCond<cond1>)(fieldNameInOtherLanguage<field1> innerJoin(CG1.CUST_NO = CG2.CUST_IDN) fieldNameInOtherLanguage<field2> leftJoin(CG1.OO_NO = GL1.ORGN_NUM and GL1.HYREN_S_DATE <= '#{ETL_DT}') renamedField(DCB_DCB_ORBRHA,GL1) ),T)))

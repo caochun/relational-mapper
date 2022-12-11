@@ -6,12 +6,22 @@ import {
 
 // 节点菜单
 export const nodeMenu = ({
+  onEditNode,
+  onEditCol,
   onDelxNode
 }) => [
     {
       key: 'setting',
       title: '节点设置',
       onClick: (key, data) => {
+        onEditNode(data);
+        console.log('click setting')
+      }
+    }, {
+      key: 'setcol',
+      title: '操作设置',
+      onClick: (key, data) => {
+        onEditCol(data);
         console.log('click setting')
       }
     },
@@ -53,8 +63,6 @@ export const edgeMenu = ({
   ];
 
 export const actionMenu = ({
-  onAddEdge,
-  onDelEdge,
   onAddNode,
   onDelNode,
   onSetGridMode,
@@ -117,7 +125,7 @@ export const actionMenu = ({
       key: 'res',
       onClick: () => {
         var res = "";
-        console.log('resini:', res);
+        console.log('ini:', res);
         res = onCreateRes();
         console.log('resbeforealert:', res);
         alert(res)
