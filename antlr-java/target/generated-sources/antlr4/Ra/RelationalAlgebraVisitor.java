@@ -11,6 +11,13 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface RelationalAlgebraVisitor<T> extends ParseTreeVisitor<T> {
 	/**
+	 * Visit a parse tree produced by the {@code innerjoin}
+	 * labeled alternative in {@link RelationalAlgebraParser#exp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInnerjoin(RelationalAlgebraParser.InnerjoinContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code selection}
 	 * labeled alternative in {@link RelationalAlgebraParser#exp}.
 	 * @param ctx the parse tree
@@ -59,6 +66,12 @@ public interface RelationalAlgebraVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitRelation(RelationalAlgebraParser.RelationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link RelationalAlgebraParser#innerJoinExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInnerJoinExp(RelationalAlgebraParser.InnerJoinExpContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link RelationalAlgebraParser#groupbyExp}.
 	 * @param ctx the parse tree
@@ -113,6 +126,12 @@ public interface RelationalAlgebraVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitCondition(RelationalAlgebraParser.ConditionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link RelationalAlgebraParser#likeExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLikeExp(RelationalAlgebraParser.LikeExpContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link RelationalAlgebraParser#attributes}.
 	 * @param ctx the parse tree

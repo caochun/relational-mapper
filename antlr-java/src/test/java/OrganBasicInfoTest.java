@@ -1,6 +1,7 @@
 import Ra.RelationalAlgebraInterpreter;
 import Ra.RelationalAlgebraLexer;
 import Ra.RelationalAlgebraParser;
+import Ra.SqlGenerator;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -44,6 +45,8 @@ public class OrganBasicInfoTest {
         RelationalAlgebraInterpreter interpreter = new RelationalAlgebraInterpreter();
         String query = (String) interpreter.visit(tree);
         System.out.println(query);
+        SqlGenerator sqlGenerator = new SqlGenerator("dialect.json");
+        sqlGenerator.resumeDialects();
         //assertEquals(out, query);
     }
 }

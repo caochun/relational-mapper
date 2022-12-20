@@ -1,0 +1,10 @@
+[
+  {
+    "placeHolder": "ƒ1",
+    "context": "nvl(a, b)"
+  },
+  {
+    "placeHolder": "ƒ2",
+    "context" : "cast(a, char)"
+  }
+]

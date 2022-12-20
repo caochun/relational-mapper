@@ -16,6 +16,18 @@ public class RelationalAlgebraBaseListener implements RelationalAlgebraListener 
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterInnerjoin(RelationalAlgebraParser.InnerjoinContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitInnerjoin(RelationalAlgebraParser.InnerjoinContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterSelection(RelationalAlgebraParser.SelectionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -95,6 +107,18 @@ public class RelationalAlgebraBaseListener implements RelationalAlgebraListener 
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitRelation(RelationalAlgebraParser.RelationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterInnerJoinExp(RelationalAlgebraParser.InnerJoinExpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitInnerJoinExp(RelationalAlgebraParser.InnerJoinExpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -203,6 +227,18 @@ public class RelationalAlgebraBaseListener implements RelationalAlgebraListener 
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitCondition(RelationalAlgebraParser.ConditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLikeExp(RelationalAlgebraParser.LikeExpContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLikeExp(RelationalAlgebraParser.LikeExpContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

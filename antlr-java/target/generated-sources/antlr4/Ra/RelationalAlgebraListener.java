@@ -8,6 +8,18 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface RelationalAlgebraListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by the {@code innerjoin}
+	 * labeled alternative in {@link RelationalAlgebraParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void enterInnerjoin(RelationalAlgebraParser.InnerjoinContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code innerjoin}
+	 * labeled alternative in {@link RelationalAlgebraParser#exp}.
+	 * @param ctx the parse tree
+	 */
+	void exitInnerjoin(RelationalAlgebraParser.InnerjoinContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code selection}
 	 * labeled alternative in {@link RelationalAlgebraParser#exp}.
 	 * @param ctx the parse tree
@@ -91,6 +103,16 @@ public interface RelationalAlgebraListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitRelation(RelationalAlgebraParser.RelationContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link RelationalAlgebraParser#innerJoinExp}.
+	 * @param ctx the parse tree
+	 */
+	void enterInnerJoinExp(RelationalAlgebraParser.InnerJoinExpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link RelationalAlgebraParser#innerJoinExp}.
+	 * @param ctx the parse tree
+	 */
+	void exitInnerJoinExp(RelationalAlgebraParser.InnerJoinExpContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link RelationalAlgebraParser#groupbyExp}.
 	 * @param ctx the parse tree
@@ -181,6 +203,16 @@ public interface RelationalAlgebraListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCondition(RelationalAlgebraParser.ConditionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link RelationalAlgebraParser#likeExp}.
+	 * @param ctx the parse tree
+	 */
+	void enterLikeExp(RelationalAlgebraParser.LikeExpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link RelationalAlgebraParser#likeExp}.
+	 * @param ctx the parse tree
+	 */
+	void exitLikeExp(RelationalAlgebraParser.LikeExpContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link RelationalAlgebraParser#attributes}.
 	 * @param ctx the parse tree

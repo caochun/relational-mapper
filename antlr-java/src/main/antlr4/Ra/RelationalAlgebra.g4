@@ -20,6 +20,12 @@ exp :
     | STRING #relation
     | groupbyExp exp #groupby
     | exp UNION exp #union
+    | exp innerJoinExp exp #innerjoin
+    ;
+
+innerJoinExp :
+    INNER_JOIN // this won't work on specific sql release version
+    | INNER_JOIN conditions
     ;
 
 groupbyExp :
@@ -35,8 +41,9 @@ newAttributes :
     | newAttribute COMMA newAttributes
     ;
 newAttribute :
-    attribute STRING
-    | constString STRING
+    constVar STRING
+    | attribute STRING
+
 ;
 
 //newTableName :
@@ -56,7 +63,7 @@ selectionExp :
     SELECTION conditions exp
     ;
 
-conditions:
+conditions :
     condition |
     condition logicOp conditions
     ;
@@ -65,7 +72,14 @@ condition :
     attribute RELOP attribute
     | constVar RELOP attribute
     | attribute RELOP constVar
+    | likeExp
     ;
+
+
+likeExp :
+    attribute LIKE constVar
+    ;
+
 
 // Varlist
 attributes :
@@ -90,22 +104,28 @@ dialect :
 ;
 
 casestmts :
-    casestmt SEMI attribute
+    casestmt SEMI constVar
+    | casestmt SEMI attribute
     | casestmt SEMI casestmts
+
 ;
 
 casestmt :
     conditions COMMA attribute
+    | conditions COMMA constVar
 ;
 
 constVar :
-    NUMBER
-    | constString
+    constString
+    | NUMBER
     ;
 
 constString :
     SINGLE_QUOTA STRING SINGLE_QUOTA
+    | SINGLE_QUOTA SINGLE_QUOTA
     ;
+
+
 UNION : '∪';
 GROUP_BY: 'γ';
 DIALECT : 'ƒ';
@@ -115,6 +135,7 @@ RENAME : 'ρ';
 SELECTION : 'σ';
 PROJECTION : 'π';
 LEFT_OUTER_JOIN : '⟕';
+INNER_JOIN : '⨝';
 AND : '∧';
 OR : '∨';
 DOT : '.';
@@ -125,8 +146,11 @@ LP : '(';
 RP : ')';
 SEMI : ';';
 
+
+LIKE : L I K E;
+STRING : [\u4e00-\u9fa5a-zA-Z0-9_%{}#*]+ ;
 NUMBER : [0-9]+ ;
-STRING : [\u4e00-\u9fa5a-zA-Z0-9_'%{}#*]+ ;
+
 
 
 
