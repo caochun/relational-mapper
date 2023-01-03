@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="antlr-java-Baeldung" target="17" />
+      <module name="antlr-java" target="16" />
     </bytecodeTargetLevel>
   </component>
 </project>

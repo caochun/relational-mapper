@@ -1,0 +1,18 @@
+[
+  {
+    "placeHolder": "ƒ(1)",
+    "context": "CAST(T1.TAKE_EFFT_DATE AS STRING)"
+  },
+  {
+    "placeHolder": "ƒ(2)",
+    "context" : "CAST(T1.TAKE_EFFT_EXPI_DATE AS STRING)"
+  },
+  {
+    "placeHolder": "ƒ(3)",
+    "context" : "CAST(T2.TAKE_EFFT_DATE AS STRING) <= '#{ETL_DT}'"
+  },
+  {
+    "placeHolder": "ƒ(4)",
+    "context" : "CAST(T2.TAKE_EFFT_EXPI_DATE AS STRING) > '#{ETL_DT}'"
+  }
+]
